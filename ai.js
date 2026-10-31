@@ -5,7 +5,7 @@ const side = $('#side'), scrim = $('#scrim'), historyEl = $('#history');
 
 const SEND_ICON = sendBtn.innerHTML;
 const STOP_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
-const MAX_IMG = 4 * 1024 * 1024;
+const MAX_IMG = 10 * 1024 * 1024;
 
 // ---- state ----
 // message: { role: 'user'|'assistant', text, image?: {mimeType,data}, imgUrl? (in-memory only), hadImage? }
@@ -107,16 +107,27 @@ document.addEventListener('paste', (e) => { const f = [...(e.clipboardData?.file
 document.addEventListener('dragover', (e) => e.preventDefault());
 document.addEventListener('drop', (e) => { e.preventDefault(); setImage(e.dataTransfer.files[0]); });
 
+// Shrink to <=1280px JPEG before upload: keeps the request small (Vercel caps bodies at ~4.5 MB) and replies fast.
 function setImage(file) {
   if (!file) return;
   if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) return alert('Please choose a PNG, JPEG or WebP image.');
-  if (file.size > MAX_IMG) return alert('Image is too large (max 4 MB).');
-  const r = new FileReader();
-  r.onload = () => {
-    attached = { mimeType: file.type, data: r.result.split(',')[1], url: r.result };
-    prevImg.src = r.result; attachPrev.hidden = false; refreshSend(); input.focus();
+  if (file.size > MAX_IMG) return alert('Image is too large (max 10 MB).');
+  const src = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    const scale = Math.min(1, 1280 / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(img.width * scale)); c.height = Math.max(1, Math.round(img.height * scale));
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); // flatten transparency
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    URL.revokeObjectURL(src);
+    const url = c.toDataURL('image/jpeg', 0.85);
+    attached = { mimeType: 'image/jpeg', data: url.split(',')[1], url };
+    prevImg.src = url; attachPrev.hidden = false; refreshSend(); input.focus();
   };
-  r.readAsDataURL(file);
+  img.onerror = () => { URL.revokeObjectURL(src); alert('Could not read that image.'); };
+  img.src = src;
 }
 function clearImage() { attached = null; fileIn.value = ''; attachPrev.hidden = true; refreshSend(); }
 
@@ -174,7 +185,10 @@ async function generate() {
       }),
     });
     if (r.status === 404 || r.status === 405)
-      throw new Error(`This page isn't connected to the Word Wave server (error ${r.status}).\n\nStart it with "node server.js" and open http://localhost:3000/ai.html — don't use Live Server, file://, or another port.`);
+      throw new Error(`The chat backend isn't reachable (error ${r.status}).
+
+Locally: run "node server.js" and open http://localhost:3000/ai.html.
+On Vercel: redeploy the latest code and make sure GROQ_API_KEY is set in Environment Variables.`);
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `Request failed (${r.status})`);
     const reader = r.body.getReader(), dec = new TextDecoder();
     for (;;) {

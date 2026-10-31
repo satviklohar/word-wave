@@ -1,0 +1,8 @@
+{
+  "functions": { "api/chat.js": { "maxDuration": 60 } },
+  "rewrites": [
+    { "source": "/lumina", "destination": "/lumina/dist/index.html" },
+    { "source": "/lumina/", "destination": "/lumina/dist/index.html" },
+    { "source": "/lumina/assets/:path*", "destination": "/lumina/dist/assets/:path*" }
+  ]
+}
