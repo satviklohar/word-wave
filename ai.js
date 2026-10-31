@@ -156,6 +156,103 @@ async function send(text) {
   await generate();
 }
 
+// ---- talking to the model ----
+// 1) Normal: our own backend (/api/chat) keeps the Groq key on the server.
+// 2) Static hosts (GitHub Pages etc.) have no backend -> the visitor adds their own Groq key,
+//    stored only in their browser, and the page calls Groq directly.
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'qwen/qwen3.8-27b';
+let directMode = false;
+
+async function* readStream(body) {
+  const reader = body.getReader(), dec = new TextDecoder();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return;
+    yield dec.decode(value, { stream: true });
+  }
+}
+
+async function* streamReply(payload, options, signal) {
+  if (!directMode) {
+    let r = null;
+    try {
+      r = await fetch('api/chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal,
+        body: JSON.stringify({ messages: payload, options }),
+      });
+    } catch (e) { if (e.name === 'AbortError') throw e; }
+    if (r && ![404, 405, 501].includes(r.status)) {
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `Request failed (${r.status})`);
+      yield* readStream(r.body);
+      return;
+    }
+    directMode = true;               // no backend here -> go direct
+    $('#keyBtn').hidden = false;
+  }
+  yield* directGroq(await getKey(), payload, options, signal);
+}
+
+function systemPrompt(o) {
+  return 'You are Word Wave, a friendly professional scriptwriting assistant. ' +
+    'Help with screenplays, TV, YouTube, podcast, Reel/Short, stage and ad scripts, plus story ideas, beats, characters and rewrites. ' +
+    'When asked for a script, write it in proper plain-text script format (scene headings, action, character names, dialogue) with no markdown. ' +
+    `Defaults unless the user says otherwise: format = ${o.format}, genre = ${o.genre}, length = ${o.length}. ` +
+    'If an image is attached, use it as inspiration. Keep non-script replies brief.';
+}
+
+async function* directGroq(key, payload, options, signal) {
+  const messages = payload.slice(-30).map((m) => {
+    if (m.role === 'assistant' || !m.image) return { role: m.role, content: m.text || ' ' };
+    return { role: 'user', content: [
+      { type: 'text', text: m.text || ' ' },
+      { type: 'image_url', image_url: { url: `data:${m.image.mimeType};base64,${m.image.data}` } },
+    ] };
+  });
+  const r = await fetch(GROQ_URL, {
+    method: 'POST', signal,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+    body: JSON.stringify({ model: GROQ_MODEL, stream: true, messages: [{ role: 'system', content: systemPrompt(options) }, ...messages] }),
+  });
+  if (!r.ok) {
+    const msg = (await r.json().catch(() => ({}))).error?.message || `Groq error ${r.status}`;
+    if (r.status === 401) { try { localStorage.removeItem('ww_groq_key'); } catch {} throw new Error('Groq rejected that key. Click "API key" in the sidebar and enter a valid one.'); }
+    throw new Error(msg);
+  }
+  let buf = '';
+  for await (const chunk of readStream(r.body)) {
+    buf += chunk;
+    const lines = buf.split('\n'); buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data:')) continue;
+      const d = line.slice(5).trim();
+      if (!d || d === '[DONE]') continue;
+      try { const t = JSON.parse(d).choices?.[0]?.delta?.content; if (t) yield t; } catch {}
+    }
+  }
+}
+
+// ---- API key dialog (direct mode only) ----
+const keyModal = $('#keyModal'), keyInput = $('#keyInput');
+function storedKey() { try { return localStorage.getItem('ww_groq_key') || ''; } catch { return ''; } }
+function getKey(force) {
+  const have = storedKey();
+  if (have && !force) return Promise.resolve(have);
+  return new Promise((resolve, reject) => {
+    keyInput.value = ''; keyModal.hidden = false; keyInput.focus();
+    const done = (fn) => { keyModal.hidden = true; $('#keyForm').onsubmit = null; $('#keyCancel').onclick = null; fn(); };
+    $('#keyForm').onsubmit = (e) => {
+      e.preventDefault();
+      const k = keyInput.value.trim();
+      if (!k) return;
+      try { localStorage.setItem('ww_groq_key', k); } catch {}
+      done(() => resolve(k));
+    };
+    $('#keyCancel').onclick = () => done(() => reject(new Error('Add a free Groq API key to chat on this site (console.groq.com/keys).')));
+  });
+}
+$('#keyBtn').onclick = () => getKey(true).catch(() => {});
+
 async function generate() {
   msgsEl.querySelectorAll('.act').forEach((b) => { if (b.textContent.includes('Regenerate')) b.remove(); });
   const bot = botNode('');
@@ -177,24 +274,9 @@ async function generate() {
 
   let out = '', ok = true, stopped = false;
   try {
-    const r = await fetch('/api/chat', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: abortCtl.signal,
-      body: JSON.stringify({
-        messages: payload,
-        options: { format: $('#format').value, genre: $('#genre').value, length: $('#length').value },
-      }),
-    });
-    if (r.status === 404 || r.status === 405)
-      throw new Error(`The chat backend isn't reachable (error ${r.status}).
-
-Locally: run "node server.js" and open http://localhost:3000/ai.html.
-On Vercel: redeploy the latest code and make sure GROQ_API_KEY is set in Environment Variables.`);
-    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `Request failed (${r.status})`);
-    const reader = r.body.getReader(), dec = new TextDecoder();
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      out += dec.decode(value, { stream: true });
+    const options = { format: $('#format').value, genre: $('#genre').value, length: $('#length').value };
+    for await (const piece of streamReply(payload, options, abortCtl.signal)) {
+      out += piece;
       bot.body.textContent = out;
       const near = thread.scrollHeight - thread.scrollTop - thread.clientHeight < 160;
       if (near) thread.scrollTop = thread.scrollHeight;
@@ -203,7 +285,7 @@ On Vercel: redeploy the latest code and make sure GROQ_API_KEY is set in Environ
     if (err.name === 'AbortError') { stopped = true; }
     else {
       ok = false;
-      out = out || '⚠ ' + err.message + (location.protocol === 'file:' ? '\n\nOpen the site through the server: run "node server.js" and visit http://localhost:3000/ai.html' : '');
+      out = out || '⚠ ' + err.message;
       bot.body.classList.add('err');
     }
   }

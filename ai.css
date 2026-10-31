@@ -162,3 +162,15 @@ option{background:#12121f;color:#f2f1fa}
 .to-bottom:hover{background:var(--a)}
 .act{transition:background .2s,color .2s,border-color .2s}
 .act:hover{border-color:rgba(255,255,255,.25)}
+
+/* api key dialog */
+.keybtn{background:none;border:0;border-top:1px solid var(--line);text-align:left;width:100%}
+.keymodal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;z-index:120;padding:20px}
+.keycard{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px;max-width:440px;width:100%;display:grid;gap:14px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.keycard h3{font-size:1.2rem}
+.keycard p{color:var(--muted);font-size:.9rem}
+.keycard a{color:var(--b);text-decoration:underline}
+.keycard input{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px 14px;color:var(--fg);font:inherit}
+.keycard input:focus{outline:2px solid var(--a)}
+.keyacts{display:flex;gap:10px;justify-content:flex-end}
+.savekey{background:linear-gradient(135deg,var(--a),var(--c));border:0;border-radius:999px;padding:9px 20px;color:#fff;font-weight:600}

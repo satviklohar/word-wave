@@ -14,6 +14,7 @@
     <button class="new" id="newChat" type="button">＋ New script chat</button>
     <p class="hist-title">Recent</p>
     <ul id="history"></ul>
+    <button class="side-link keybtn" id="keyBtn" type="button" hidden>🔑 API key</button>
     <a class="side-link" href="index.html">← Landing page</a>
   </aside>
   <div class="scrim" id="scrim"></div>
@@ -70,6 +71,16 @@
       </div>
     </form>
   </section>
+</div>
+<div class="keymodal" id="keyModal" hidden>
+  <form class="keycard" id="keyForm">
+    <h3>Connect your Groq key</h3>
+    <p>This site has no server, so it talks to Groq directly from your browser. Get a free key at
+      <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>.
+      It's saved only in this browser and sent only to Groq.</p>
+    <input id="keyInput" type="password" placeholder="gsk_…" autocomplete="off" spellcheck="false" aria-label="Groq API key">
+    <div class="keyacts"><button type="button" class="act" id="keyCancel">Cancel</button><button type="submit" class="savekey">Save &amp; continue</button></div>
+  </form>
 </div>
 <script src="ai.js"></script>
 </body>
