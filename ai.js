@@ -162,7 +162,9 @@ async function send(text) {
 //    stored only in their browser, and the page calls Groq directly.
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'qwen/qwen3.8-27b';
-let directMode = false;
+// github.io is static-only: skip the backend probe there (it would just log a 405).
+let directMode = /\.github\.io$/.test(location.hostname);
+if (directMode) $('#keyBtn').hidden = false;
 
 async function* readStream(body) {
   const reader = body.getReader(), dec = new TextDecoder();
