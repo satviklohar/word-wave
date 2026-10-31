@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Word Wave — Script Making Studio</title>
+<meta name="description" content="Write screenplays, video scripts and stories in a focused studio with beats, scenes and instant formatting.">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="landing">
+<video class="bg-video" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260429_114316_1c7889ad-2885-410e-b493-98119fee0ddb.mp4" autoplay loop muted playsinline></video>
+<div class="bg-shade"></div>
+<div class="progress" id="progress"></div>
+
+<header class="nav" id="nav">
+  <a href="#top" class="logo"><img class="logo-img" src="logo.svg" alt=""><span class="wm">Word <em>Wave</em></span></a>
+  <nav>
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="ai.html">AI writer</a>
+    
+    <a href="#formats">Formats</a>
+    <a href="ai.html" class="btn small">Start writing</a>
+  </nav>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="blob b1" data-speed="0.25"></div>
+    <div class="blob b2" data-speed="-0.15"></div>
+    <div class="hero-inner">
+      <p class="eyebrow reveal">Script making studio</p>
+      <h1 class="reveal" style="--d:.1s">Turn a spark into<br><span class="grad">a finished script.</span></h1>
+      <p class="lead reveal" style="--d:.2s">Outline beats, draft scenes and export perfectly formatted screenplays, YouTube scripts and podcast episodes — all in one calm place.</p>
+      <div class="cta reveal" style="--d:.3s">
+        <a href="ai.html" class="btn">Start a script</a>
+        <a href="#how" class="btn ghost">See how it works</a>
+      </div>
+    </div>
+    <div class="scroll-hint">Scroll<span></span></div>
+  </section>
+
+  <!-- MARQUEE -->
+  <section class="marquee" aria-hidden="true">
+    <div class="track" id="marquee">
+      <span>INT. COFFEE SHOP — DAY</span><span>FADE IN:</span><span>COLD OPEN</span><span>EXT. ROOFTOP — NIGHT</span><span>CUT TO:</span><span>VOICE OVER</span><span>MONTAGE</span><span>SMASH CUT</span>
+      <span>INT. COFFEE SHOP — DAY</span><span>FADE IN:</span><span>COLD OPEN</span><span>EXT. ROOFTOP — NIGHT</span><span>CUT TO:</span><span>VOICE OVER</span><span>MONTAGE</span><span>SMASH CUT</span>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <h2 class="reveal">Everything a writer's room needs.</h2>
+    <div class="grid">
+      <article class="card reveal" style="--d:0s"><div class="ico">✦</div><h3>Beat board</h3><p>Drag story beats into acts. See your structure before you write a single line.</p></article>
+      <article class="card reveal" style="--d:.1s"><div class="ico">❡</div><h3>Auto-formatting</h3><p>Type naturally. Scene headings, action, dialogue and parentheticals format themselves.</p></article>
+      <article class="card reveal" style="--d:.2s"><div class="ico">◐</div><h3>Character memory</h3><p>Track voices, arcs and relationships so every line sounds like the right person.</p></article>
+      <article class="card reveal" style="--d:.1s"><div class="ico">⏱</div><h3>Runtime estimate</h3><p>Know your page count and screen time as you go — for film or a 60-second short.</p></article>
+      <article class="card reveal" style="--d:.2s"><div class="ico">⌘</div><h3>Live collaboration</h3><p>Write together with cursors, comments and version history that never loses a draft.</p></article>
+      <article class="card reveal" style="--d:.3s"><div class="ico">⇩</div><h3>One-click export</h3><p>PDF, Final Draft, Fountain or teleprompter view. Industry-ready in a click.</p></article>
+    </div>
+  </section>
+
+  <!-- PINNED SCROLL DEMO -->
+  <section class="how" id="how">
+    <div class="how-sticky">
+      <div class="how-text">
+        <p class="eyebrow">How it works</p>
+        <ol class="steps" id="steps">
+          <li class="active"><b>01</b><div><h3>Capture the idea</h3><p>Drop in a logline. We shape it into a premise.</p></div></li>
+          <li><b>02</b><div><h3>Build the beats</h3><p>Arrange scenes into a structure that holds up.</p></div></li>
+          <li><b>03</b><div><h3>Write the scenes</h3><p>Draft with proper formatting, automatically.</p></div></li>
+        </ol>
+      </div>
+      <div class="page-wrap">
+        <div class="page" id="page">
+          <div class="line" data-step="0"><span class="tag">LOGLINE</span>A burned-out barista finds a script left behind that predicts her day.</div>
+          <div class="line" data-step="1"><span class="tag">ACT I</span>Discovery → Denial → First test</div>
+          <div class="line" data-step="1"><span class="tag">ACT II</span>Rules of the script → Betrayal</div>
+          <div class="line sc" data-step="2">INT. COFFEE SHOP — DAY</div>
+          <div class="line act" data-step="2">MAYA wipes the counter. A crumpled script sits by the register.</div>
+          <div class="line char" data-step="2">MAYA</div>
+          <div class="line par" data-step="2">(reading, whispering)</div>
+          <div class="line dia" data-step="2">"Maya drops the cup." ...I didn't drop the cup.</div>
+          <div class="line act" data-step="2">The cup slips. Shatters.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI GENERATOR -->
+  <section class="section" id="ai">
+    <p class="eyebrow reveal">AI co-writer</p>
+    <h2 class="reveal">Describe it. Let the AI write it.</h2>
+    <div class="ai reveal">
+      <form id="aiForm" class="ai-form" action="ai.html" method="get">
+        <input id="aiIdea" name="idea" placeholder="e.g. a robot learning to cook" required aria-label="Idea">
+        <select id="aiGenre" name="genre" aria-label="Genre">
+          <option>Drama</option><option>Comedy</option><option>Thriller</option><option>Sci-Fi</option>
+        </select>
+        <button class="btn" type="submit">Write with AI →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="section stats">
+    <div class="stat reveal"><strong data-count="48000">0</strong><span>scripts written</span></div>
+    <div class="stat reveal" style="--d:.1s"><strong data-count="12">0</strong><span>export formats</span></div>
+    <div class="stat reveal" style="--d:.2s"><strong data-count="97">0</strong><span>% would recommend</span></div>
+  </section>
+
+  <!-- FORMATS -->
+  <section class="section" id="formats">
+    <h2 class="reveal">One studio, every format.</h2>
+    <div class="chips">
+      <span class="chip reveal">🎬 Feature film</span>
+      <span class="chip reveal" style="--d:.05s">📺 TV episode</span>
+      <span class="chip reveal" style="--d:.1s">▶ YouTube video</span>
+      <span class="chip reveal" style="--d:.15s">🎙 Podcast</span>
+      <span class="chip reveal" style="--d:.2s">📱 Reels &amp; Shorts</span>
+      <span class="chip reveal" style="--d:.25s">🎭 Stage play</span>
+      <span class="chip reveal" style="--d:.3s">📢 Ad spot</span>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section final" id="start">
+    <div class="final-card reveal">
+      <h2>Your first scene is waiting.</h2>
+      <p>Describe your idea, add an image if you like, and let the AI write the first draft.</p>
+      <div class="signup"><a class="btn" href="ai.html">Open the AI writer</a></div>
+    </div>
+  </section>
+</main>
+
+<footer class="glass-footer liquid-glass">
+  <div class="gf-top">
+    <div class="gf-brand">
+      <div class="gf-logo"><img class="logo-img" src="logo.svg" alt=""><span class="wm">Word <em>Wave</em></span></div>
+      <p>A calm studio for screenplays, video scripts and stories — with an AI co-writer that works from your words and images.</p>
+    </div>
+    <div class="gf-links">
+      <div><h4>Product</h4><ul><li><a href="#features">Features</a></li><li><a href="#how">How it works</a></li><li><a href="ai.html">AI writer</a></li><li><a href="#formats">Formats</a></li></ul></div>
+      <div><h4>Studio</h4><ul><li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="#">Contact</a></li><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li></ul></div>
+    </div>
+  </div>
+  <div class="gf-bottom"><p>© <span id="yr"></span> Word Wave · Made for storytellers</p></div>
+</footer>
+<script src="script.js"></script>
+</body>
+</html>

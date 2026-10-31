@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Word Wave">
+  <defs>
+    <linearGradient id="g" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7c5cff"/>
+      <stop offset=".55" stop-color="#ff6bb5"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="14" fill="url(#g)"/>
+  <!-- W drawn as a wave -->
+  <path d="M9 15 C11.5 15 13 33 17 33 C21 33 21 20 24 20 C27 20 27 33 31 33 C35 33 36.5 15 39 15"
+        fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- cursor dot: the "writing" part -->
+  <circle cx="39" cy="38.5" r="2.4" fill="#fff" opacity=".9"/>
+</svg>
