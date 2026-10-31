@@ -173,6 +173,8 @@ async function generate() {
         options: { format: $('#format').value, genre: $('#genre').value, length: $('#length').value },
       }),
     });
+    if (r.status === 404 || r.status === 405)
+      throw new Error(`This page isn't connected to the Word Wave server (error ${r.status}).\n\nStart it with "node server.js" and open http://localhost:3000/ai.html — don't use Live Server, file://, or another port.`);
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `Request failed (${r.status})`);
     const reader = r.body.getReader(), dec = new TextDecoder();
     for (;;) {
